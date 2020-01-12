@@ -40,7 +40,10 @@ class DepArrCrawler(object):
     def driverSelenium(self):
         driver = webdriver.Firefox()
         # Driver action
-        driver.get("https://www.flightradar24.com/data/airports/" + self.airport + "/" + self.mode + "#")
+        try:
+            driver.get("https://www.flightradar24.com/data/airports/" + self.airport + "/" + self.mode + "#")
+        except Exception as e:
+            print(e)
         time.sleep(20)
 
         while True:
@@ -130,9 +133,12 @@ class DepArrCrawler(object):
         filename = self.mode + "_" + self.airport + "_" + base_time + ".csv"
         with open(filename, 'a') as f:   
             df.to_csv(f)
+            
+    def crawler(self):
+        html = self.driverSelenium()
+        df, trs = self.htmlParser(html)
+        self.saveFile(df, trs)
     
 if __name__ == '__main__':
     cdgArr = DepArrCrawler('cdg', 'arrivals')
-    html = cdgArr.driverSelenium()
-    df, trs = cdgArr.htmlParser(html)
-    cdgArr.saveFile(df, trs)
+    cdgArr.crawler()
